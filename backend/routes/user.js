@@ -4,15 +4,29 @@ const {
   loginUser,
   signupUser,
   verifyEmail,
+  editUser,
+  initiatePasswordReset,
+  resetPassword,
+  loginLimiter,
 } = require("../controllers/userController");
+const userAuth = require("../middlewares/userAuthMiddleware");
 
-//Login Route
-router.post("/login", loginUser);
+// Login Route with rate limiter
+router.post("/login", loginLimiter, loginUser);
 
-//Sign-up Route
+// Sign-up Route
 router.post("/signup", signupUser);
 
-//Email verification route
+// Email verification route
 router.get("/verify-email/:token", verifyEmail);
+
+// Edit user details route
+router.patch("/edit", userAuth, editUser);
+
+// Initiate password reset route
+router.post("/initiate-password-reset", initiatePasswordReset);
+
+// Reset password route
+router.post("/reset-password", resetPassword);
 
 module.exports = router;

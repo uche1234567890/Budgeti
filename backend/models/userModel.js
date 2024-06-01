@@ -4,13 +4,15 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const crypto = require("crypto");
 
-//Schema for the user collection in the database
+// Schema for the user collection in the database
 const userSchema = new Schema({
   firstname: {
     type: String,
-    required: true,
   },
   lastname: {
+    type: String,
+  },
+  username: {
     type: String,
     required: true,
   },
@@ -33,11 +35,23 @@ const userSchema = new Schema({
   verificationTokenExpires: {
     type: Date,
   },
+  passwordResetToken: {
+    type: String,
+  },
+  passwordResetExpires: {
+    type: Date,
+  },
 });
 
-//Static Signup Method
-userSchema.statics.signup = async function (firstname, lastname, email, password) {
-  if (!firstname || !lastname || !email || !password) {
+// Static Signup Method
+userSchema.statics.signup = async function (
+  firstname,
+  lastname,
+  username,
+  email,
+  password
+) {
+  if (!firstname || !lastname || !username || !email || !password) {
     throw Error("All field must be filled");
   }
 
@@ -63,6 +77,7 @@ userSchema.statics.signup = async function (firstname, lastname, email, password
   const user = await this.create({
     firstname,
     lastname,
+    username,
     email,
     password: hash,
     verificationToken,
@@ -108,7 +123,7 @@ userSchema.statics.resendVerificationToken = async function (email) {
   return user;
 };
 
-//Static Login Method
+// Static Login Method
 userSchema.statics.login = async function (email, password) {
   if (!email || !password) {
     throw Error("All field must be filled");
@@ -129,6 +144,75 @@ userSchema.statics.login = async function (email, password) {
   if (!match) {
     throw Error("Incorrect email or password");
   }
+
+  return user;
+};
+
+// Static Edit User Method
+userSchema.statics.editUser = async function (
+  userId,
+  firstname,
+  lastname,
+  username
+) {
+  const user = await this.findById(userId);
+
+  if (!user) {
+    throw Error("User not found");
+  }
+
+  user.firstname = firstname || user.firstname;
+  user.lastname = lastname || user.lastname;
+  user.username = username || user.username;
+
+  await user.save();
+
+  return user;
+};
+
+// Static Reset Password Methods
+userSchema.statics.initiatePasswordReset = async function (email) {
+  const user = await this.findOne({ email });
+
+  if (!user) {
+    throw Error("User not found");
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  user.passwordResetToken = resetToken;
+  user.passwordResetExpires = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+
+  await user.save();
+
+  return resetToken;
+};
+
+userSchema.statics.resetPassword = async function (email, token, newPassword) {
+  const user = await this.findOne({
+    email,
+    passwordResetToken: token,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new Error("Token is invalid or has expired");
+  }
+
+  // Check if the new password is the same as the old password
+  const isSamePassword = await bcrypt.compare(newPassword, user.password);
+  if (isSamePassword) {
+    throw new Error("New password cannot be the same as the old password");
+  }
+
+  if (!validator.isStrongPassword(newPassword)) {
+    throw Error("Password is not strong enough");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(newPassword, salt);
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
 
   return user;
 };
