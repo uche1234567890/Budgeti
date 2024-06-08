@@ -1,33 +1,35 @@
-//This file `Navbar.js` creates a Navbar that would seat on every page
-import { Link } from "react-router-dom";
-import { useLogout } from "../hooks/useLogout";
-import { useAuthContext } from "../hooks/useAuthContext";
+import { NavLink } from "react-router-dom"
+import logo from '../assets/react.svg'
+import { useState } from "react"
 
 const Navbar = () => {
-  const { logout } = useLogout();
-  const { user } = useAuthContext();
-
-  const handleClick = () => {
-    logout();
-  };
-
+    const [currentUser, setCurrentUser] = useState(false)
   return (
-    <header>
-      <div className="container">
-        <Link to="/">
-          <h1>Budgeti</h1>
-        </Link>
-        <nav>
-          {user && (
-            <div>
-              <span>{user.email}</span>
-              <button onClick={handleClick}>Log out</button>
-            </div>
-          )}
-        </nav>
-      </div>
+    <header className="bg-slate-200 shadow-md py-3">
+        <div className="flex justify-between items-center max-w-6xl mx-auto">
+            <NavLink to='/'>
+                <img src={logo} alt="job-logo" className="h-10 w-auto" />
+                <span className="hidden md:block text-black text-2xl font-bold">Budgeting App</span>
+            </NavLink>
+            <ul className='flex gap-4'>
+                <NavLink to='/'>
+                    <li className='text-slate-700 cursor-pointer hidden hover:underline sm:inline'>Home</li>
+                </NavLink>
+                <NavLink to='/about'>
+                    <li className='text-slate-700 cursor-pointer hidden hover:underline sm:inline'>About</li>
+                </NavLink>
+                <NavLink to='/profile'>
+                    {currentUser ? (
+                        <img className='rounded-full h-7 w-7 object-cover' src="" alt='Profile'/>
+                    ) : (
+                        <li className='text-slate-700 cursor-pointer hover:underline'>Sign In</li>
+                    )
+                    }
+                </NavLink>              
+            </ul>
+        </div>
     </header>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
