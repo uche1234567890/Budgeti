@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const path = require("path");
+const cors = require("cors");
 
 //Linking routes folder and file
 const userRoutes = require("./routes/user");
@@ -11,6 +11,7 @@ const app = express();
 
 //Middlewares
 app.use(express.json());
+app.use(cors());
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();

@@ -7,6 +7,8 @@ const {
   editUser,
   initiatePasswordReset,
   resetPassword,
+  uploadProfilePicture,
+  upload,
   loginLimiter,
 } = require("../controllers/userController");
 const userAuth = require("../middlewares/userAuthMiddleware");
@@ -28,5 +30,13 @@ router.post("/initiate-password-reset", initiatePasswordReset);
 
 // Reset password route
 router.post("/reset-password", resetPassword);
+
+// Upload profile picture
+router.patch(
+  "/profile-picture",
+  userAuth,
+  upload.single("image"),
+  uploadProfilePicture
+);
 
 module.exports = router;

@@ -41,6 +41,11 @@ const userSchema = new Schema({
   passwordResetExpires: {
     type: Date,
   },
+  profilePicture: {
+    type: String,
+    default:
+      "https://asset.cloudinary.com/darjwo40n/04e8a16f2831779e78a7fd92af361494", // default avatar URL
+  },
 });
 
 // Static Signup Method

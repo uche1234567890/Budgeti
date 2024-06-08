@@ -2,11 +2,25 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const rateLimit = require("express-rate-limit");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 
 // Function to create Token that can be reused upon every user signup
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "1d" }); // Creating a token that expires in 1 day
 };
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY_CLOUDINARY,
+  api_secret: process.env.API_SECRET,
+});
+
+// Set up multer
+const storage = multer.memoryStorage(); // store image in memory
+const upload = multer({ storage: storage });
 
 // Create a nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -82,12 +96,9 @@ const loginUser = async (req, res) => {
       try {
         const user = await User.resendVerificationToken(email);
         sendVerificationEmail(user, req);
-        return res
-          .status(400)
-          .json({
-            error:
-              "Email not verified. A new verification email has been sent.",
-          });
+        return res.status(400).json({
+          error: "Email not verified. A new verification email has been sent.",
+        });
       } catch (resendError) {
         return res.status(400).json({ error: resendError.message });
       }
@@ -163,6 +174,66 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const uploadProfilePicture = async (req, res, next) => {
+  const userId = req.user._id;
+
+  if (!req.file) {
+    return res.status(400).json({ error: "No image file provided" });
+  }
+  if (!req.file.mimetype.startsWith("image/")) {
+    return res.status(400).json({ error: "Invalid File type" });
+  }
+
+  try {
+    // Setup Cloudinary upload stream
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "budgeti",
+        format: "png",
+        public_id: `${req.file.originalname.replace(
+          /\.[^/.]+$/,
+          ""
+        )}_${Date.now()}`,
+        transformation: {
+          width: 400,
+          height: 400,
+          crop: "fill",
+          quality: "auto:good",
+          gravity: "faces",
+          fetch_format: "auto",
+          max_bytes: 80000,
+        },
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("Error uploading to Cloudinary", error);
+          return res
+            .status(500)
+            .json({ error: "Error uploading image to Cloudinary" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        user.profilePicture = result.secure_url;
+        await user.save();
+
+        res.status(200).json({
+          message: "Profile picture updated successfully",
+          url: result.secure_url,
+        });
+      }
+    );
+
+    // Stream the file buffer to Cloudinary
+    streamifier.createReadStream(req.file.buffer).pipe(stream);
+  } catch (error) {
+    console.error("Error processing image", error);
+  }
+};
+
 module.exports = {
   loginUser,
   signupUser,
@@ -171,4 +242,6 @@ module.exports = {
   initiatePasswordReset,
   resetPassword,
   loginLimiter,
+  uploadProfilePicture,
+  upload,
 };
