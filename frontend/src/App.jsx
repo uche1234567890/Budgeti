@@ -4,6 +4,10 @@ import MainLayout from './pages/MainLayout'
 import PrivateRoute from './components/PrivateRoute'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
+import Profile from './pages/Profile'
+import EmailConfirmation from './pages/EmailConfirmation'
+import RequestPasswordReset from './pages/RequestPasswordReset'
+import PasswordReset from './pages/PasswordReset'
 import './App.css'
 
 function App() {
@@ -14,8 +18,12 @@ function App() {
         <Route index={true} path='/' element={<Home />}/>
         <Route path='/sign-up' element={<SignUp />}/>
         <Route path='/sign-in' element={<SignIn />}/>
+        <Route path='/verify-email/:token' element={<EmailConfirmation />}/>
+        <Route path='/reset-password/:token' element={<PasswordReset />}/>
+        <Route path='/request-reset-password' element={<RequestPasswordReset />}/>
+        <Route path='/profile' element={<Profile />}/>
         <Route element={<PrivateRoute />}>
-
+            <Route path='/profile' element={<Profile />}/>
         </Route>
         {/* <Route path='/add-job' element={<AddJobPage addJobSubmit={addJob}/>}/>
         <Route path='/edit-job/:id' element={<EditJobPage editJobSubmit={updateJob}/>} loader={jobLoader}/>

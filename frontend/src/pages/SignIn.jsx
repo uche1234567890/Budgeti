@@ -3,13 +3,25 @@ import { useForm } from "react-hook-form"
 import { NavLink, useNavigate } from "react-router-dom"
 import { FaEye, FaEyeSlash} from 'react-icons/fa'
 import { toast } from "react-toastify"
+import axios from "axios"
+
+const url = 'http://localhost:6000/api'
 
 const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false)
     const {register, handleSubmit, formState: {errors}} = useForm()
 
+    const navigate = useNavigate()
+
     const submitForm = async (data) => {
-        console.log(data)
+        const {email, password} = data
+        await axios.post(`${url}/user/login`, { email, password}).then(response => {
+            console.log(response)
+            toast.success("Sign In Successful")
+            navigate("/profile")
+          }).catch(err => {
+            toast.error(err.response.data.message)
+          })
       }
 
   return (

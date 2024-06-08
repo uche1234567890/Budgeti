@@ -3,7 +3,7 @@ import logo from '../assets/react.svg'
 import { useState } from "react"
 
 const Navbar = () => {
-    const [currentUser, setCurrentUser] = useState(false)
+    const [currentUser, setCurrentUser] = useState(true)
   return (
     <header className="bg-slate-200 shadow-md py-3">
         <div className="flex justify-between items-center max-w-6xl mx-auto">
