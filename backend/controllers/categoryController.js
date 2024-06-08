@@ -13,10 +13,10 @@ const getCategories = async (req, res) => {
 
 // Create a new category
 const createCategory = async (req, res) => {
-  const { name, icon } = req.body;
+  const { name, icon, budgetAmount } = req.body;
   const userId = req.user._id;
   try {
-    const category = new Category({ name, icon, user: userId });
+    const category = new Category({ name, icon, budgetAmount, user: userId });
     await category.save();
     res.status(201).json(category);
   } catch (error) {
@@ -26,12 +26,12 @@ const createCategory = async (req, res) => {
 
 // Update a category
 const updateCategory = async (req, res) => {
-  const { categoryId, name, icon } = req.body;
+  const { categoryId, name, icon, budgetAmount } = req.body;
   const userId = req.user._id;
   try {
     const category = await Category.findOneAndUpdate(
       { _id: categoryId, user: userId },
-      { name, icon },
+      { name, icon, budgetAmount },
       { new: true }
     );
     if (!category) {

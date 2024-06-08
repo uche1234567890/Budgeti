@@ -6,6 +6,7 @@ const cors = require("cors");
 //Linking routes folder and file
 const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
+const authRoutes = require("./routes/auth");
 
 //Express App created
 const app = express();
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
 //Routes
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/auth", authRoutes);
 
 //Connecting to MongoDB using mongoose
 mongoose
