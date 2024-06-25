@@ -7,6 +7,8 @@ const cors = require("cors");
 const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
 const authRoutes = require("./routes/auth");
+const transactionRoutes = require("./routes/transaction");
+const aggregationRoutes = require("./routes/aggregation");
 
 //Express App created
 const app = express();
@@ -23,6 +25,8 @@ app.use((req, res, next) => {
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/transaction", transactionRoutes);
+app.use("/api/aggregation",  aggregationRoutes);
 
 //Connecting to MongoDB using mongoose
 mongoose

@@ -5,48 +5,51 @@ const validator = require("validator");
 const crypto = require("crypto");
 
 // Schema for the user collection in the database
-const userSchema = new Schema({
-  firstname: {
-    type: String,
+const userSchema = new Schema(
+  {
+    firstname: {
+      type: String,
+    },
+    lastname: {
+      type: String,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    verificationTokenExpires: {
+      type: Date,
+    },
+    passwordResetToken: {
+      type: String,
+    },
+    passwordResetExpires: {
+      type: Date,
+    },
+    profilePicture: {
+      type: String,
+      default:
+        "https://asset.cloudinary.com/darjwo40n/04e8a16f2831779e78a7fd92af361494", // default avatar URL
+    },
   },
-  lastname: {
-    type: String,
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  verificationToken: {
-    type: String,
-  },
-  verificationTokenExpires: {
-    type: Date,
-  },
-  passwordResetToken: {
-    type: String,
-  },
-  passwordResetExpires: {
-    type: Date,
-  },
-  profilePicture: {
-    type: String,
-    default:
-      "https://asset.cloudinary.com/darjwo40n/04e8a16f2831779e78a7fd92af361494", // default avatar URL
-  },
-});
+  { timestamps: true }
+);
 
 // Static Signup Method
 userSchema.statics.signup = async function (
