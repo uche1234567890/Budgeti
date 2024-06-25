@@ -170,10 +170,51 @@ const getTransactionsByMonth = async (req, res) => {
   }
 };
 
+// Get transactions by day for a user
+const getTransactionsByDay = async (req, res) => {
+  const userId = req.user._id;
+  const { dayMonthYear } = req.params;
+
+  try {
+    const isValidFormat = moment(dayMonthYear, "DD-MM-YYYY", true).isValid();
+    if (!isValidFormat) {
+      return res
+        .status(400)
+        .json({ message: "Invalid date format. Use DD-MM-YYYY." });
+    }
+    const startDate = moment
+      .utc(dayMonthYear, "DD-MM-YYYY")
+      .startOf("day")
+      .toDate();
+    const endDate = moment
+      .utc(dayMonthYear, "DD-MM-YYYY")
+      .endOf("day")
+      .toDate();
+
+    const transactions = await Transaction.find({
+      user: userId,
+      date: { $gte: startDate, $lte: endDate },
+    }).populate("category", "name icon budgetAmount");
+
+    if (transactions.length === 0) {
+      return res.status(200).json({
+        message: `No transactions are recorded on ${dayMonthYear}`,
+      });
+    }
+
+    res.status(200).json({ transactions });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
+
 module.exports = {
   createTransaction,
   deleteTransaction,
   updateTransaction,
   listTransactions,
   getTransactionsByMonth,
+  getTransactionsByDay,
 };

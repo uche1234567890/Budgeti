@@ -80,7 +80,7 @@ userSchema.statics.signup = async function (
   const hash = await bcrypt.hash(password, salt);
 
   const verificationToken = crypto.randomBytes(32).toString("hex");
-  const verificationTokenExpires = Date.now() + 6 * 60 * 60 * 1000; // 6 hours
+  const verificationTokenExpires = Date.now() + 3 * 60 * 60 * 1000; // 6 hours
 
   const user = await this.create({
     firstname,
@@ -125,7 +125,7 @@ userSchema.statics.resendVerificationToken = async function (email) {
   }
 
   user.verificationToken = crypto.randomBytes(32).toString("hex");
-  user.verificationTokenExpires = Date.now() + 6 * 60 * 60 * 1000; // 6 hours
+  user.verificationTokenExpires = Date.now() + 3 * 60 * 60 * 1000; // 6 hours
   await user.save();
 
   return user;
@@ -188,7 +188,7 @@ userSchema.statics.initiatePasswordReset = async function (email) {
 
   const resetToken = crypto.randomBytes(32).toString("hex");
   user.passwordResetToken = resetToken;
-  user.passwordResetExpires = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+  user.passwordResetExpires = Date.now() + 3 * 60 * 60 * 1000; // 1 hour
 
   await user.save();
 
