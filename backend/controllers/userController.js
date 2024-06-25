@@ -37,8 +37,9 @@ const transporter = nodemailer.createTransport({
 // Send verification email
 const sendVerificationEmail = (user, req) => {
   const tokenAndEmail = `${user.verificationToken}+${user.email}`;
-  const encryptedTokenAndEmail = encrypt(tokenAndEmail);
-  const verificationUrl = `https://testenv-budgetapp-ui-app.onrender.com/verify-email/${encryptedTokenAndEmail}`;
+  const encryptedTokenAndEmail = encrypt(tokenAndEmail).encryptedMessage;
+  const key = encrypt(tokenAndEmail).key
+  const verificationUrl = `https://testenv-budgetapp-ui-app.onrender.com/verify-email/${encryptedTokenAndEmail}&key=${key}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: user.email,
@@ -58,8 +59,9 @@ const sendVerificationEmail = (user, req) => {
 // Send password reset email
 const sendPasswordResetEmail = (email, token, req) => {
   const tokenAndEmail = `${token}+${email}`;
-  const encryptedTokenAndEmail = encrypt(tokenAndEmail);
-  const resetUrl = `https://testenv-budgetapp-ui-app.onrender.com/reset-password/${encryptedTokenAndEmail}`;
+  const encryptedTokenAndEmail = encrypt(tokenAndEmail).encryptedMessage;
+  const key = encrypt(tokenAndEmail).key
+  const resetUrl = `https://testenv-budgetapp-ui-app.onrender.com/reset-password/${encryptedTokenAndEmail}&key=${key}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: email,
@@ -93,6 +95,7 @@ const loginUser = async (req, res) => {
     const token = createToken(user._id);
     res.status(200).json({ email, token });
   } catch (error) {
+    console.log(error)
     if (error.message === "Email not verified") {
       try {
         const user = await User.resendVerificationToken(email);
@@ -156,6 +159,10 @@ const editUser = async (req, res) => {
 const initiatePasswordReset = async (req, res) => {
   const { email } = req.body;
   try {
+    const emailExists = await User.findOne({email})
+    if(!emailExists){
+      return res.status(400).json({message: "Email does not exist on the system"})
+    }
     const token = await User.initiatePasswordReset(email);
     sendPasswordResetEmail(email, token, req);
     res.status(200).json({ message: "Password reset email sent" });

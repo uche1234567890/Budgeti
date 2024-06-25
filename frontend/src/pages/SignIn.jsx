@@ -5,7 +5,8 @@ import { FaEye, FaEyeSlash} from 'react-icons/fa'
 import { toast } from "react-toastify"
 import axios from "axios"
 
-const url = 'http://localhost:6000/api'
+const apiUrl = import.meta.env.VITE_API_URL;
+const devApiUrl = 'http://localhost:8000';
 
 const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false)
@@ -15,8 +16,9 @@ const SignIn = () => {
 
     const submitForm = async (data) => {
         const {email, password} = data
-        await axios.post(`${url}/user/login`, { email, password}).then(response => {
+        await axios.post(`${devApiUrl}/api/auth/login`, { email, password}).then(response => {
             console.log(response)
+            localStorage.setItem("token", response.data.token)
             toast.success("Sign In Successful")
             navigate("/profile")
           }).catch(err => {
@@ -37,7 +39,7 @@ const SignIn = () => {
                 <input type={showPassword ? 'text' : 'password'} name="confirmPassword" id="confirmPassword" placeholder="Password" className="focus:outline-none w-100" 
                 {...register("password", {required: "Password is required"})}/>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    {showPassword ? <FaEye className="text-black" /> : <FaEyeSlash className="text-black"/>}
                 </div>
             </div>
             {errors.password && (<p className="text-red-500 text-sm pb-2 font-bold">{errors.password.message}.</p>)}

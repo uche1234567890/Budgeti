@@ -8,6 +8,8 @@ import Profile from './pages/Profile'
 import EmailConfirmation from './pages/EmailConfirmation'
 import RequestPasswordReset from './pages/RequestPasswordReset'
 import PasswordReset from './pages/PasswordReset'
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css'
 
 function App() {
@@ -20,7 +22,7 @@ function App() {
         <Route path='/sign-in' element={<SignIn />}/>
         <Route path='/verify-email/:token' element={<EmailConfirmation />}/>
         <Route path='/reset-password/:token' element={<PasswordReset />}/>
-        <Route path='/request-reset-password' element={<RequestPasswordReset />}/>
+        <Route path='/forgot-password' element={<RequestPasswordReset />}/>
         <Route path='/profile' element={<Profile />}/>
         <Route element={<PrivateRoute />}>
             <Route path='/profile' element={<Profile />}/>

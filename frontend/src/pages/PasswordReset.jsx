@@ -1,11 +1,13 @@
 import {useState} from 'react'
 import { useForm } from 'react-hook-form'
+import { handleDecrypt } from '../utils/decryptToken'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 
-const url = 'http://localhost:6000/api'
+const apiUrl = import.meta.env.VITE_API_URL;
+const devApiUrl = 'http://localhost:8000';
 
 const PasswordReset = () => {
     const {register, handleSubmit, watch, formState: {errors}} = useForm()
@@ -13,15 +15,19 @@ const PasswordReset = () => {
     const { token } = useParams();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const decryptedToken = handleDecrypt(token.split('&key=')[0], token.split('&key=')[1])
+    const tokenValue = decryptedToken.split("+")[0]
+    const userValue = decryptedToken.split("+")[1]
 
     const submitForm = async (data) => {
         const {email, password} = data
       console.log(data)
-      await axios.post(`${url}/user/reset-password`, {email, token, newPassword: password}).then(response => {
+      await axios.post(`${devApiUrl}/api/auth/reset-password`, {email, tokenValue, newPassword: password}).then(response => {
         console.log(response)
         toast.success("Sign In Successful")
       }).catch(err => {
-        toast.error(err.response.data.message)
+        console.log(err)
+        toast.error(err.response.data.error)
       })
      
     }

@@ -14,8 +14,8 @@ const aggregationRoutes = require("./routes/aggregation");
 const app = express();
 
 //Middlewares
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();

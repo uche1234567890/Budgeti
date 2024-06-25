@@ -5,7 +5,9 @@ import { FaEye, FaEyeSlash} from 'react-icons/fa'
 import { useState } from "react"
 import { toast } from "react-toastify"
 
-const url = 'http://localhost:6000/api'
+const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
+const devApiUrl = 'http://localhost:8000';
+
 
 
 const SignUp = () => {
@@ -17,12 +19,12 @@ const SignUp = () => {
     const navigate = useNavigate()
 
     const submitForm = async (data) => {
-        const { firstname, lastname, username, email, password} = data
+      const { firstname, lastname, username, email, password} = data
       console.log(data)
-      await axios.post(`${url}/user/signup`, {firstname, lastname, username, email, password}).then(response => {
+      await axios.post(`${devApiUrl}/api/auth/signup`, {firstname, lastname, username, email, password}).then(response => {
         console.log(response)
-        toast.success("Sign In Successful")
-        navigate("/profile")
+        toast.success("Sign In Successful, Checkyour email for a the verification link to proceed")
+        //navigate("/sign-in")
       }).catch(err => {
         toast.error(err.response.data.message)
       })

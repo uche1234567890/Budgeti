@@ -2,7 +2,8 @@ import { useForm } from "react-hook-form"
 import axios from "axios"
 import { toast } from "react-toastify"
 
-const url = 'http://localhost:6000/api'
+const apiUrl = import.meta.env.VITE_API_URL;
+const devApiUrl = 'http://localhost:8000';
 
 const RequestPasswordReset = () => {
     const {register, handleSubmit, formState: {errors}} = useForm()
@@ -10,10 +11,11 @@ const RequestPasswordReset = () => {
     const submitForm = async (data) => {
         const {email} = data
       console.log(data)
-      await axios.post(`${url}/user/initiate-password-reset`, {email}).then(response => {
+      await axios.post(`${devApiUrl}/api/auth/initiate-password-reset`, {email}).then(response => {
         console.log(response)
-        toast.success("Sign In Successful")
+        toast.success(response.data.message)
       }).catch(err => {
+        console.log(err)
         toast.error(err.response.data.message)
       })
      

@@ -18,6 +18,6 @@ router.post("/create", userAuth, createCategory);
 router.patch("/update", userAuth, updateCategory);
 
 // Delete a category
-router.delete("/delete", userAuth, deleteCategory);
+router.delete("/delete/:categoryId", userAuth, deleteCategory);
 
 module.exports = router;

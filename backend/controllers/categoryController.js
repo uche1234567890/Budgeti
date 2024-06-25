@@ -45,7 +45,7 @@ const updateCategory = async (req, res) => {
 
 // Delete a category
 const deleteCategory = async (req, res) => {
-  const { categoryId } = req.body;
+  const { categoryId } = req.params;
   const userId = req.user._id;
   try {
     const category = await Category.findOneAndDelete({
