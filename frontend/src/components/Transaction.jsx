@@ -1,36 +1,63 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { FaEye, FaTrash, FaPen} from 'react-icons/fa'
 import axios from "axios";
 import { toast } from "react-toastify";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { formatDate } from "../utils/dateSanitizer";
+import { formatNumberWithNaira } from "../utils/numberFormatter";
+import { useNavigate } from "react-router-dom";
+import TransactionModal from "./TransactionModal";
+import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
+import { formatDateValue } from "../utils/dateFomat";
 
-const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
+//const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
 const devApiUrl = 'http://localhost:8000';
 
 const Transaction = () => {
-    const [showIncomeModal, setShowIncomeModal] = useState(false)
-    const [showExpenseModal, setShowExpenseModal] = useState(false)
-    const [categories, setCategories] = useState([])
+    const [showTransactionModal, setShowTransactionModal] = useState(false)
     const [transactions, setTransactions] = useState([])
-    const {register, handleSubmit, watch, formState: {errors}} = useForm()
-    const type = watch("type");
+    const [transactionId, setTransactionId] = useState()
+    const [isEdit, setIsEdit] = useState(false)
+    const [initialValues, setInitialValues] = useState();
+    const navigate = useNavigate()
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    const [filterType, setFilterType] = useState();
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+    const handleFilterTypeChange = (event) => {
+      setFilterType(event.target.value);
+    };
+
+    const handleDateChange = async(date) => {
+      setSelectedDate(date);
+      await axios.get(`${devApiUrl}/api/transaction/by-day/${formatDateValue(date, 'day')}`).then(response => {
+        setTransactions(response.data.transactions)
+        //toast.success("Sign In Successful")
+        //navigate("/profile")
+      }).catch(err => {
+        toast.error(err.response.data.message)
+      })
+    };
+
+    const handleMonthChange = async (date) => {
+      setSelectedMonth(date);
+      await axios.get(`${devApiUrl}/api/transaction/by-month/${formatDateValue(date, 'month')}`).then(response => {
+        setTransactions(response.data.transactions)
+        //toast.success("Sign In Successful")
+        //navigate("/profile")
+      }).catch(err => {
+        toast.error(err.response.data.message)
+      })
+    };
 
     useEffect(() => {
-        const fetchCategories = async () => {
-          await axios.get(`${devApiUrl}/api/category/get-all`).then(response => {
-            console.log(response)
-            setCategories(response.data)
-            //toast.success("Sign In Successful")
-            //navigate("/profile")
-          }).catch(err => {
-            toast.error(err.response.data.message)
-          })
-        }
 
         const fetchTransactions = async () => {
           await axios.get(`${devApiUrl}/api/transaction/list-all`).then(response => {
-            console.log(response)
             setTransactions(response.data.transactions)
             //toast.success("Sign In Successful")
             //navigate("/profile")
@@ -39,33 +66,99 @@ const Transaction = () => {
           })
         }
 
-        fetchCategories()
         fetchTransactions()
     }, [])
 
-    const submitForm = async (data) => {
-      console.log(data)
-      const {type, amount, description, category} = data
-      await axios.post(`${devApiUrl}/api/transaction/create`, {type, amount, description, category}).then(response => {
+    const handleCreate = () => {
+      setInitialValues({});
+      setIsEdit(false);
+      setShowTransactionModal(true);
+  };
+
+  const handleEdit = (transaction) => {
+      console.log(transaction)
+      setTransactionId(transaction._id)
+      setInitialValues(transaction);
+      setIsEdit(true);
+      setShowTransactionModal(true);
+  };
+
+    const handleDelete = async (transactionId) => {
+      console.log(transactionId)
+      await axios.delete(`${devApiUrl}/api/transaction/delete/${transactionId}`).then(response => {
         console.log(response)
-        toast.success("Category Creation Successful")
-        //navigate("/profile")
+        toast.success("Deleted Successfully")
+        navigate("/profile")
       }).catch(err => {
         toast.error(err.response.data.message)
       })
     }
 
+    const submitForm = async (data) => {
+      console.log(data)
+      if(isEdit){
+        const {type, amount, description, category} = data
+        await axios.patch(`${devApiUrl}/api/transaction/update/${transactionId}`, {type, amount, description, category}).then(response => {
+          console.log(response)
+          //toast.success("Category Creation Successful")
+          //navigate("/profile")
+        }).catch(err => {
+          toast.error(err.response.data.message)
+        })
+      }else{
+        const {type, amount, description, category} = data
+        await axios.post(`${devApiUrl}/api/transaction/create`, {type, amount, description, category}).then(response => {
+          console.log(response)
+          toast.success("Category Creation Successful")
+          //navigate("/profile")
+        }).catch(err => {
+          toast.error(err.response.data.message)
+        })
+      }
+      
+    }
+
   return (
     <div>
-        <h2>Transaction</h2>
-        <div>
-            <button className="px-4 py-2 rounded-lg bg-indigo-600 text-white" onClick={() => setShowIncomeModal(true)}>Create Transaction</button>
+        <div className="flex flex-row justify-end mb-2 mx-2">
+            <div className="flex flex-row mx-2 items-center">
+              <div className="mb-4">
+                <select value={filterType} onChange={handleFilterTypeChange} className="border p-2 rounded-lg">
+                  <option value="">Select Time Period</option>
+                  <option value="day">Day</option>
+                  <option value="month">Month</option>
+                </select>
+              </div>
+
+              {filterType === 'day' && (
+                <div className="mb-4">
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={handleDateChange}
+                    dateFormat="dd-MM-yyyy"
+                    className="border p-2 rounded-lg"
+                  />
+                </div>
+              ) }
+              { filterType === 'month' && (
+                <div className="mb-4">
+                  <DatePicker
+                    selected={selectedMonth}
+                    onChange={handleMonthChange}
+                    dateFormat="MM-yyyy"
+                    showMonthYearPicker
+                    className="border p-2 rounded-lg"
+                  />
+                </div>
+              ) }
+            </div>
+            <button className="px-4 py-2 rounded-lg bg-indigo-600 text-white" onClick={handleCreate}>Create Transaction</button>
         </div>
         
 
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white">
+        <thead className="text-xs text-gray-700 uppercase border-b-2 border-slate-700 bg-gray-50">
             <tr>
                 <th scope="col" className="px-6 py-3">
                     Type
@@ -77,7 +170,7 @@ const Transaction = () => {
                     description
                 </th>
                 <th scope="col" className="px-6 py-3">
-                    Updated
+                    Created
                 </th>
                 <th scope="col" className="px-6 py-3">
                     Action
@@ -85,34 +178,39 @@ const Transaction = () => {
             </tr>
         </thead>
         <tbody>
-          {transactions?.map((transaction) => (
-            <tr key={transaction.id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {transaction.type}
+          {transactions?.map((transaction, index) => (
+            <tr key={index} className="bg-white dark:border-gray-700">
+                <th scope="row" className={`px-6 py-4 font-medium whitespace-nowrap ${transaction.type == 'income' ? 'text-blue-500' : transaction.type == 'expense' ? 'text-red-500': 'text-blue-500'}`}>
+                    {capitalizeFirstLetter(transaction.type)}
                 </th>
                 <td className="px-6 py-4">
-                    {transaction.amount}
+                    {formatNumberWithNaira(transaction.amount)}
                 </td>
                 <td className="px-6 py-4">
                     {transaction.description}
                 </td>
                 <td className="px-6 py-4">
-                    {transaction.updatedAt}
+                    {formatDate(transaction.createdAt)}
                 </td>
-                <td className="px-6 py-4">
-                    <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                    <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Delete</a>
-                    <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</a>
+                <td className="flex gap-2 px-6 py-4">
+                    <a href="#" className="font-medium text-blue-600 dark:text-blue-500 cursor-pointer hover:underline" onClick={() => handleEdit(transaction)}><FaPen /></a>
+                    <a href="#" className="font-medium text-red-600 dark:text-red-500 cursor-pointer hover:underline" onClick={() => handleDelete(transaction._id)}><FaTrash /></a>
+                    {/* <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => handleDelete(transaction._id)}><FaEye /></a> */}
                 </td>
             </tr>
           ))
           }
+          {transactions.length < 1 && (
+          <div className="text-gray-700 items-center font-normal text-lg py-32">
+              No transaction avaialble at this point
+            </div>
+          )}
         </tbody>
     </table>
 </div>
 
 
-        {showIncomeModal ? (
+        {showTransactionModal ? (
         <>
           <div
             className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
@@ -123,11 +221,11 @@ const Transaction = () => {
                 {/*header*/}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
                   <h3 className="text-3xl font-semibold">
-                    Create Income
+                    {isEdit ? "Edit Transaction" : "Create Transaction"}
                   </h3>
                   <button
                     className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => setShowIncomeModal(false)}
+                    onClick={() => setShowTransactionModal(false)}
                   >
                     <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
                       ×
@@ -136,57 +234,21 @@ const Transaction = () => {
                 </div>
                 {/*body*/}
                 <div className="relative p-6 flex-auto">
-                <form className="flex flex-col gap-4" onSubmit={handleSubmit((data) => submitForm(data))}>
-                    <div className="mb-4">
-                      <select name="type" id="type" className="border p-3 rounded-lg w-full" {...register("type", { required: "Please select a type" })}>
-                        <option value="">Select Type</option>
-                        <option value="income">Income</option>
-                        <option value="expense">Expense</option>
-                      </select>
-                      {errors.type && (<p className="text-red-500 text-sm pb-2 font-bold">{errors.type.message}</p>)}
-                    </div>
-
-                    <div className="mb-4">
-                      <input type="number" name="amount" id="amount" placeholder="Amount" className="border p-3 rounded-lg w-full" 
-                      {...register("amount", {required: "Please input an amount" })}/>
-                      {errors.amount && (<p className="text-red-500 text-sm pb-2 font-bold">{errors.amount.message}</p>)}
-                    </div>
-
-                    {type == "expense" && <div className="mb-4">
-                      <select name="category" id="category" className="border p-3 rounded-lg w-full" {...register("category", { required: "Please select a category" })}>
-                        <option value="">Select Category</option>
-                        {categories.map((category) => (
-                          <option key={category._id} value={category._id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.category && (<p className="text-red-500 text-sm pb-2 font-bold">{errors.category.message}</p>)}
-                    </div>}
-
-                    <div className="mb-4">
-                      <textarea name="description" id="description" placeholder="Description" className="border p-3 rounded-lg w-full"
-                        {...register("description", { required: "Please input a description" })}
-                      />
-                      {errors.description && (<p className="text-red-500 text-sm pb-2 font-bold">{errors.description.message}</p>)}
-                    </div>
-
-                    <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80" type="submit">Create Income</button>
-                  </form>
+                  <TransactionModal initialValues={initialValues} onSubmit={submitForm} title={isEdit ? "Edit": "Create"}/>
                 </div>
                 {/*footer*/}
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                   <button
                     className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
-                    onClick={() => setShowIncomeModal(false)}
+                    onClick={() => setShowTransactionModal(false)}
                   >
                     Close
                   </button>
                   <button
                     className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
-                    onClick={() => setShowIncomeModal(false)}
+                    onClick={() => setShowTransactionModal(false)}
                   >
                     Save Changes
                   </button>

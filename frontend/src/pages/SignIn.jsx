@@ -4,12 +4,14 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { FaEye, FaEyeSlash} from 'react-icons/fa'
 import { toast } from "react-toastify"
 import axios from "axios"
+import { useAuth } from "../context/UserContext"
 
-const apiUrl = import.meta.env.VITE_API_URL;
+//const apiUrl = import.meta.env.VITE_API_URL;
 const devApiUrl = 'http://localhost:8000';
 
 const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false)
+    const { setAuthUser, setIsLoggedIn} = useAuth()
     const {register, handleSubmit, formState: {errors}} = useForm()
 
     const navigate = useNavigate()
@@ -17,10 +19,11 @@ const SignIn = () => {
     const submitForm = async (data) => {
         const {email, password} = data
         await axios.post(`${devApiUrl}/api/auth/login`, { email, password}).then(response => {
-            console.log(response)
             localStorage.setItem("token", response.data.token)
             toast.success("Sign In Successful")
-            navigate("/profile")
+            setIsLoggedIn(true)
+            setAuthUser(response.data.user)
+            navigate("/dashboard")
           }).catch(err => {
             toast.error(err.response.data.message)
           })

@@ -199,7 +199,7 @@ userSchema.statics.resetPassword = async function (email, token, newPassword) {
   const user = await this.findOne({
     email,
     passwordResetToken: token,
-    passwordResetExpires: { $gt: Date.now() },
+    //passwordResetExpires: { $gt: Date.now() },
   });
 
   if (!user) {

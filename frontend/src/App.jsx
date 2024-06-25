@@ -4,13 +4,13 @@ import MainLayout from './pages/MainLayout'
 import PrivateRoute from './components/PrivateRoute'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
-import Profile from './pages/Profile'
 import EmailConfirmation from './pages/EmailConfirmation'
 import RequestPasswordReset from './pages/RequestPasswordReset'
 import PasswordReset from './pages/PasswordReset'
-import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css'
+import Dashboard from './pages/Dashboard'
+import Profile from './pages/Profile'
 
 function App() {
 
@@ -23,8 +23,8 @@ function App() {
         <Route path='/verify-email/:token' element={<EmailConfirmation />}/>
         <Route path='/reset-password/:token' element={<PasswordReset />}/>
         <Route path='/forgot-password' element={<RequestPasswordReset />}/>
-        <Route path='/profile' element={<Profile />}/>
         <Route element={<PrivateRoute />}>
+            <Route path='/dashboard' element={<Dashboard />}/>
             <Route path='/profile' element={<Profile />}/>
         </Route>
         {/* <Route path='/add-job' element={<AddJobPage addJobSubmit={addJob}/>}/>

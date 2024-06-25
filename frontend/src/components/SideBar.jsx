@@ -1,7 +1,19 @@
-
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/UserContext"
 
 // eslint-disable-next-line react/prop-types
 const SideBar = ({ setState }) => {
+  const {setIsLoggedIn, setAuthUser} = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogOut = () => {
+    localStorage.removeItem("token")
+    setIsLoggedIn(false);
+    setAuthUser(null);
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('isLoggedIn');
+    navigate("/")
+  }
   
   return (
     <div className="h-screen bg-slate-200 text-black w-64 p-4">
@@ -14,9 +26,9 @@ const SideBar = ({ setState }) => {
           <button onClick={() => setState('Transaction')} className="hover:text-gray-400">Transaction</button>
         </li>
         <li className="mb-4">
-          <button onClick={() => setState('Expense')} className="hover:text-gray-400">Expense</button>
+          <button onClick={() => setState('Expense')} className="hover:text-gray-400">Budget</button>
         </li>
-        <li className="mb-4"><a href="#logout" className="hover:text-gray-400">Logout</a></li>
+        <li className="mb-4"><a href="#logout" className="hover:text-gray-400" onClick={handleLogOut}>Logout</a></li>
       </ul>
     </div>
   )

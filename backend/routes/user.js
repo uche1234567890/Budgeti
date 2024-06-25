@@ -8,7 +8,7 @@ const {
 const userAuth = require("../middlewares/userAuthMiddleware");
 
 // Edit user details route
-router.patch("/edit", userAuth, editUser);
+router.patch("/edit/:id", userAuth, editUser);
 
 // Upload profile picture
 router.patch(

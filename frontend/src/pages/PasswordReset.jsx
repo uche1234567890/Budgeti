@@ -1,17 +1,20 @@
+/* eslint-disable no-unused-vars */
 import {useState} from 'react'
 import { useForm } from 'react-hook-form'
 import { handleDecrypt } from '../utils/decryptToken'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 
-const apiUrl = import.meta.env.VITE_API_URL;
+//const apiUrl = import.meta.env.VITE_API_URL;
 const devApiUrl = 'http://localhost:8000';
 
 const PasswordReset = () => {
     const {register, handleSubmit, watch, formState: {errors}} = useForm()
     const password = watch("password");
+    const navigate = useNavigate()
     const { token } = useParams();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -25,6 +28,7 @@ const PasswordReset = () => {
       await axios.post(`${devApiUrl}/api/auth/reset-password`, {email, tokenValue, newPassword: password}).then(response => {
         console.log(response)
         toast.success("Sign In Successful")
+        navigate("/sign-in")
       }).catch(err => {
         console.log(err)
         toast.error(err.response.data.error)

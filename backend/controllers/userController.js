@@ -93,7 +93,7 @@ const loginUser = async (req, res) => {
     const user = await User.login(email, password);
     // Creating a token
     const token = createToken(user._id);
-    res.status(200).json({ email, token });
+    res.status(200).json({ user, token });
   } catch (error) {
     console.log(error)
     if (error.message === "Email not verified") {
@@ -143,8 +143,12 @@ const verifyEmail = async (req, res) => {
 
 // Edit User
 const editUser = async (req, res) => {
+  const { id } = req.params
   const { firstname, lastname, username } = req.body;
   const userId = req.user._id;
+  // if(id !== userId){
+  //   return res.status(400).json({message: "Invalid User"})
+  // }
   try {
     const user = await User.editUser(userId, firstname, lastname, username);
     res
@@ -184,7 +188,7 @@ const resetPassword = async (req, res) => {
 
 const uploadProfilePicture = async (req, res, next) => {
   const userId = req.user._id;
-
+  
   if (!req.file) {
     return res.status(400).json({ error: "No image file provided" });
   }

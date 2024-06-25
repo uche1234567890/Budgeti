@@ -1,9 +1,9 @@
-import { useState } from "react"
 import { Outlet, Navigate } from "react-router-dom"
+import { useAuth } from "../context/UserContext"
 
 const PrivateRoute = () => {
-    const { currentUser } = useState(false)
-  return currentUser ? <Outlet /> : <Navigate to='sign-in' />
+    const { isLoggedIn } = useAuth()
+  return isLoggedIn ? <Outlet /> : <Navigate to='sign-in' />
 }
 
 export default PrivateRoute

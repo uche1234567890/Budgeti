@@ -158,6 +158,7 @@ const getTransactionsByMonth = async (req, res) => {
 
     if (transactions.length === 0) {
       return res.status(200).json({
+        transactions: [],
         message: `No transactions are recorded in the month of ${monthYear}`,
       });
     }
@@ -198,6 +199,7 @@ const getTransactionsByDay = async (req, res) => {
 
     if (transactions.length === 0) {
       return res.status(200).json({
+        transactions: [],
         message: `No transactions are recorded on ${dayMonthYear}`,
       });
     }
