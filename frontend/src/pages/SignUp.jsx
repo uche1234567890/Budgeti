@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash} from 'react-icons/fa'
 import { useState } from "react"
 import { toast } from "react-toastify"
 
-const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
+// const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
 const devApiUrl = 'http://localhost:8000';
 
 

@@ -80,7 +80,7 @@ userSchema.statics.signup = async function (
   const hash = await bcrypt.hash(password, salt);
 
   const verificationToken = crypto.randomBytes(32).toString("hex");
-  const verificationTokenExpires = Date.now() + 3 * 60 * 60 * 1000; // 6 hours
+  const verificationTokenExpires = Date.now() + 3 * 60 * 60 * 1000; // 3 hours
 
   const user = await this.create({
     firstname,
@@ -125,7 +125,7 @@ userSchema.statics.resendVerificationToken = async function (email) {
   }
 
   user.verificationToken = crypto.randomBytes(32).toString("hex");
-  user.verificationTokenExpires = Date.now() + 3 * 60 * 60 * 1000; // 6 hours
+  user.verificationTokenExpires = Date.now() + 3 * 60 * 60 * 1000; // 3 hours
   await user.save();
 
   return user;
@@ -188,7 +188,7 @@ userSchema.statics.initiatePasswordReset = async function (email) {
 
   const resetToken = crypto.randomBytes(32).toString("hex");
   user.passwordResetToken = resetToken;
-  user.passwordResetExpires = Date.now() + 3 * 60 * 60 * 1000; // 1 hour
+  user.passwordResetExpires = Date.now() + 3 * 60 * 60 * 1000; // 3 hour
 
   await user.save();
 
@@ -199,9 +199,13 @@ userSchema.statics.resetPassword = async function (email, token, newPassword) {
   const user = await this.findOne({
     email,
     passwordResetToken: token,
-    //passwordResetExpires: { $gt: Date.now() },
+    passwordResetExpires: { $gt: Date.now() },
   });
 
+  console.log("Reset Token:", token);
+  console.log("Password Reset Expires:", user ? user.passwordResetExpires : "User not found");
+  console.log("Current Time:", Date.now());
+  
   if (!user) {
     throw new Error("Token is invalid or has expired");
   }

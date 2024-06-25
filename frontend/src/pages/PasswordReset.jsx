@@ -20,12 +20,12 @@ const PasswordReset = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const decryptedToken = handleDecrypt(token.split('&key=')[0], token.split('&key=')[1])
     const tokenValue = decryptedToken.split("+")[0]
-    const userValue = decryptedToken.split("+")[1]
+    const userEmail= decryptedToken.split("+")[1]
 
     const submitForm = async (data) => {
         const {email, password} = data
       console.log(data)
-      await axios.post(`${devApiUrl}/api/auth/reset-password`, {email, tokenValue, newPassword: password}).then(response => {
+      await axios.post(`${devApiUrl}/api/auth/reset-password`, {email: userEmail, token: tokenValue, newPassword: password }).then(response => {
         console.log(response)
         toast.success("Sign In Successful")
         navigate("/sign-in")

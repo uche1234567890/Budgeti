@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form"
 import axios from "axios"
 import { toast } from "react-toastify"
 
-const apiUrl = import.meta.env.VITE_API_URL;
+//const apiUrl = import.meta.env.VITE_API_URL;
 const devApiUrl = 'http://localhost:8000';
 
 const RequestPasswordReset = () => {
