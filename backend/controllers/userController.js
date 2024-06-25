@@ -5,6 +5,7 @@ const rateLimit = require("express-rate-limit");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
+const { encrypt } = require("../utils/cryptoUtils");
 
 // Function to create Token that can be reused upon every user signup
 const createToken = (_id) => {
@@ -35,9 +36,9 @@ const transporter = nodemailer.createTransport({
 
 // Send verification email
 const sendVerificationEmail = (user, req) => {
-  const verificationUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/user/verify-email/${user.verificationToken}`;
+  const tokenAndEmail = `${user.verificationToken}+${user.email}`;
+  const encryptedTokenAndEmail = encrypt(tokenAndEmail);
+  const verificationUrl = `https://testenv-budgetapp-ui-app.onrender.com/verify-email/${encryptedTokenAndEmail}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: user.email,
@@ -56,9 +57,9 @@ const sendVerificationEmail = (user, req) => {
 
 // Send password reset email
 const sendPasswordResetEmail = (email, token, req) => {
-  const resetUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/user/reset-password/${token}`;
+  const tokenAndEmail = `${token}+${email}`;
+  const encryptedTokenAndEmail = encrypt(tokenAndEmail);
+  const resetUrl = `https://testenv-budgetapp-ui-app.onrender.com/reset-password/${encryptedTokenAndEmail}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: email,
