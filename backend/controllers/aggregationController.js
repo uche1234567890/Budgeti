@@ -182,6 +182,7 @@ const sumMonthlyExpensesByCategory = async (req, res) => {
           categoryId: "$category._id",
           name: "$category.name",
           icon: "$category.icon",
+          budgetAmount: "$category.budgetAmount",
           totalAmount: 1,
         },
       },
@@ -257,6 +258,61 @@ const sumYearlyExpensesByCategory = async (req, res) => {
   }
 };
 
+// 8. Forecast next month's expense
+const forecastNextMonthExpense = async (req, res) => {
+  const userId = req.user._id;
+  const currentDate = moment.utc();
+
+  const currentYear = currentDate.year();
+  const startDate = moment.utc(currentYear, "YYYY").startOf("year").toDate();
+  const endDate = currentDate.endOf("month").toDate();
+
+  try {
+    // Get total expenses for the current year
+    const transactions = await Transaction.aggregate([
+      {
+        $match: {
+          user: userId,
+          type: "expense",
+          date: { $gte: startDate, $lte: endDate },
+        },
+      },
+      { $group: { _id: null, totalExpenses: { $sum: "$amount" } } },
+    ]);
+    const totalExpenses = transactions.length > 0 ? transactions[0].totalExpenses : 0;
+
+    // Get the number of months with expense entries in the current year
+    const monthCount = await Transaction.aggregate([
+      {
+        $match: {
+          user: userId,
+          type: "expense",
+          date: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: { year: { $year: "$date" }, month: { $month: "$date" } },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const monthCountValue = monthCount.length > 0 ? monthCount[0].count : 0;
+
+    // Calculate projected expense for the next month
+    const projectedExpense = monthCountValue > 0 ? totalExpenses / monthCountValue : 0;
+
+    res.status(200).json({ projectedExpense });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 module.exports = {
   sumCategoryBudget,
   sumMonthlyExpenses,
@@ -265,4 +321,5 @@ module.exports = {
   sumYearlyIncome,
   sumMonthlyExpensesByCategory,
   sumYearlyExpensesByCategory,
+  forecastNextMonthExpense,
 };

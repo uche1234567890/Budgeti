@@ -9,7 +9,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 
 //const apiUrl = import.meta.env.VITE_API_URL;
-const devApiUrl = 'http://localhost:8000';
+const devApiUrl = 'https://budgeti-api.onrender.com';
 
 const PasswordReset = () => {
     const {register, handleSubmit, watch, formState: {errors}} = useForm()
@@ -36,7 +36,7 @@ const PasswordReset = () => {
      
     }
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 max-w-lg mx-auto h-screen">
         <h2 className="text-3xl text-center font-semibold my-7">Reset Your Password</h2>
         <form className='flex flex-col gap-4' onSubmit={handleSubmit((data) => submitForm(data))}>
         <input type="email" name="email" id="email" placeholder="Email Address" className="border p-3 rounded-lg" 

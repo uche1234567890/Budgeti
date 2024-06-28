@@ -5,7 +5,7 @@ import axios from 'axios'
 import { toast } from "react-toastify";
 
 //const apiUrl = import.meta.env.VITE_API_URL;
-const devApiUrl = 'http://localhost:8000';
+const devApiUrl = 'https://budgeti-api.onrender.com';
 
 const Profile = () => {
   const fileRef = useRef(null)
@@ -16,9 +16,6 @@ const Profile = () => {
   const [email, setEmail] = useState(authUser.email)
   const token = localStorage.getItem('token');
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
 
   const navigate = useNavigate()
 
@@ -34,38 +31,6 @@ const Profile = () => {
       toast.error(err.response.data.message)
   })
   }
-
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-};
-
-const handleUpload = async () => {
-    if (!image) {
-        toast.error("Please select an image to upload");
-        return;
-    }
-
-    setLoading(true);
-
-    const formData = new FormData();
-    formData.append('file', image);
-    // formData.append('Profile Image', 'Profile Image');
-
-    try {
-        const response = await axios.patch(
-            `${devApiUrl}/api/user/profile-picture`, 
-            formData
-        );
-
-        setImageUrl(response.data.secure_url);
-        toast.error('Image uploaded successfully');
-    } catch (error) {
-        console.error('Error uploading image:', error);
-        toast.error('Error uploading image');
-    } finally {
-        setLoading(false);
-    }
-};
 
 
   return (
@@ -89,14 +54,6 @@ const handleUpload = async () => {
       <div className="mt-5">
           {/* <span className="text-red-700 cursor-pointer" onClick={signUserOut}>Sign Out</span> */}
       </div>
-      <div className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Update Profile Picture</h2>
-            <input type="file" accept="image/*" ref={fileRef}  onChange={handleImageChange} className="mb-4" hidden/>
-            <img onClick={() => fileRef.current.click()} className="rounded-full w-24 h-24 object-cover cursor-pointer my-2 self-center" src={imageUrl || authUser.profilePicture} alt="Profile Image" />
-            <button onClick={handleUpload} className="px-4 py-2 rounded-lg bg-indigo-600 text-white" disabled={loading}>
-                {loading ? 'Uploading...' : 'Upload Image'}
-            </button>
-        </div>
     </div>
   )
 }

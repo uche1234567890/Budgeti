@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 
 //const apiUrl = "https://testenv-budgetapp-api.onrender.com";
-const devApiUrl = 'http://localhost:8000';
+const devApiUrl = 'https://budgeti-api.onrender.com';
 
 const EmailConfirmation = () => {
     const [status, setStatus] = useState('Verifying...');

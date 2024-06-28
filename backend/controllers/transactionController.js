@@ -211,7 +211,40 @@ const getTransactionsByDay = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
+// Get transactions by year for a user
+const getTransactionsByYear = async (req, res) => {
+  const userId = req.user._id;
+  const { year } = req.params;
 
+  try {
+    const isValidFormat = moment(year, "YYYY", true).isValid();
+    if (!isValidFormat) {
+      return res
+        .status(400)
+        .json({ message: "Invalid date format. Use YYYY." });
+    }
+    const startDate = moment.utc(year, "YYYY").startOf("year").toDate();
+    const endDate = moment.utc(year, "YYYY").endOf("year").toDate();
+
+    const transactions = await Transaction.find({
+      user: userId,
+      date: { $gte: startDate, $lte: endDate },
+    }).populate("category", "name icon budgetAmount");
+
+    if (transactions.length === 0) {
+      return res.status(200).json({
+        transactions: [],
+        message: `No transactions are recorded in the year ${year}`,
+      });
+    }
+
+    res.status(200).json({ transactions });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
 module.exports = {
   createTransaction,
   deleteTransaction,
@@ -219,4 +252,5 @@ module.exports = {
   listTransactions,
   getTransactionsByMonth,
   getTransactionsByDay,
+  getTransactionsByYear,
 };
