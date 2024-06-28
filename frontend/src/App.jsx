@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
+import ProfilePicture from './components/ProfilePicture'
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
         <Route element={<PrivateRoute />}>
             <Route path='/dashboard' element={<Dashboard />}/>
             <Route path='/profile' element={<Profile />}/>
+            <Route path='/profile-picture' element={<ProfilePicture/>}/>
         </Route>
         {/* <Route path='/add-job' element={<AddJobPage addJobSubmit={addJob}/>}/>
         <Route path='/edit-job/:id' element={<EditJobPage editJobSubmit={updateJob}/>} loader={jobLoader}/>

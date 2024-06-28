@@ -7,7 +7,7 @@ import axios from "axios"
 import { useAuth } from "../context/UserContext"
 
 //const apiUrl = import.meta.env.VITE_API_URL;
-const devApiUrl = 'http://localhost:8000';
+const devApiUrl = 'https://budgeti-api.onrender.com';
 
 const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false)
@@ -25,12 +25,12 @@ const SignIn = () => {
             setAuthUser(response.data.user)
             navigate("/dashboard")
           }).catch(err => {
-            toast.error(err.response.data.message)
+            toast.error(err.response.data.error)
           })
       }
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 max-w-lg mx-auto h-screen">
         <h2 className="text-3xl text-center font-semibold my-7">Sign In</h2>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit((data) => submitForm(data))}>
 
