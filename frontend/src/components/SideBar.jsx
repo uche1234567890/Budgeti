@@ -78,7 +78,7 @@ const SideBar = ({ state, setState }) => {
       </ul>
       <div className="mt-auto flex flex-row items-center">
         <NavLink to="/profile-picture">
-          <img src="path/to/profile-icon.jpg" alt="Profile Icon" className="w-10 h-10 rounded-full mr-4 bg-slate-700" />
+          <img src={authUser.profilePicture} alt="Profile Icon" className="w-10 h-10 rounded-full mr-4 bg-slate-700" />
         </NavLink>
         <span className="text-xl font-bold text-white">{authUser.username}</span>
       </div>

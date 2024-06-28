@@ -6,7 +6,7 @@ import { useState } from "react"
 import { toast } from "react-toastify"
 
 // const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
-const devApiUrl = 'https://budgeti-api.onrender.com';
+const devApiUrl = 'https://budgeti-efsd.onrender.com';
 
 
 

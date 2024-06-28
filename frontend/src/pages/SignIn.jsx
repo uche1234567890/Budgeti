@@ -7,7 +7,7 @@ import axios from "axios"
 import { useAuth } from "../context/UserContext"
 
 //const apiUrl = import.meta.env.VITE_API_URL;
-const devApiUrl = 'https://budgeti-api.onrender.com';
+const devApiUrl = 'https://budgeti-efsd.onrender.com';
 
 const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false)

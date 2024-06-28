@@ -202,9 +202,6 @@ userSchema.statics.resetPassword = async function (email, token, newPassword) {
     passwordResetExpires: { $gt: Date.now() },
   });
 
-  console.log("Reset Token:", token);
-  console.log("Password Reset Expires:", user ? user.passwordResetExpires : "User not found");
-  console.log("Current Time:", Date.now());
   
   if (!user) {
     throw new Error("Token is invalid or has expired");

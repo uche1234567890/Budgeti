@@ -3,7 +3,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 
 //const apiUrl = import.meta.env.VITE_API_URL;
-const devApiUrl = 'https://budgeti-api.onrender.com';
+const devApiUrl = 'https://budgeti-efsd.onrender.com';
 
 const RequestPasswordReset = () => {
     const {register, handleSubmit, formState: {errors}} = useForm()

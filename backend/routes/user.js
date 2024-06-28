@@ -11,10 +11,9 @@ const userAuth = require("../middlewares/userAuthMiddleware");
 router.patch("/edit/:id", userAuth, editUser);
 
 // Upload profile picture
-router.patch(
+router.post(
   "/profile-picture",
   userAuth,
-  upload.single("image"),
   uploadProfilePicture
 );
 
