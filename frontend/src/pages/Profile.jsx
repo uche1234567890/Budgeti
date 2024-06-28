@@ -5,7 +5,7 @@ import axios from 'axios'
 import { toast } from "react-toastify";
 
 //const apiUrl = import.meta.env.VITE_API_URL;
-const devApiUrl = 'https://budgeti-efsd.onrender.com';
+const devApiUrl = 'http://localhost:8000';
 
 const Profile = () => {
   const fileRef = useRef(null)

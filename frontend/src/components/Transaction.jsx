@@ -13,7 +13,7 @@ import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 import { formatDateValue } from "../utils/dateFomat";
 
 //const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
-const devApiUrl = 'https://budgeti-efsd.onrender.com';
+const devApiUrl = 'http://localhost:8000';
 
 const Transaction = () => {
     const [showTransactionModal, setShowTransactionModal] = useState(false)

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
 //const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
-const devApiUrl = 'https://budgeti-efsd.onrender.com';
+const devApiUrl = 'http://localhost:8000';
 
 const TransactionModal = ({ initialValues, onSubmit, title}) => {
     const {register, handleSubmit, watch, reset, setValue, formState: {errors}} = useForm({

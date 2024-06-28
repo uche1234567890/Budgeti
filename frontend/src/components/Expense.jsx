@@ -14,7 +14,7 @@ const months = [
 ];
 
 //const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
-const devApiUrl = 'https://budgeti-efsd.onrender.com';
+const devApiUrl = 'http://localhost:8000';
 
 
 const Expense = () => {

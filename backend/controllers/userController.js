@@ -39,7 +39,7 @@ const sendVerificationEmail = (user, req) => {
   const tokenAndEmail = `${user.verificationToken}+${user.email}`;
   const encryptedTokenAndEmail = encrypt(tokenAndEmail).encryptedMessage;
   const key = encrypt(tokenAndEmail).key
-  const verificationUrl = `https://budgeti-api.onrender.com/verify-email/${encryptedTokenAndEmail}&key=${key}`;
+  const verificationUrl = `https://budgeti-efsd.onrender.com/verify-email/${encryptedTokenAndEmail}&key=${key}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: user.email,
@@ -61,7 +61,7 @@ const sendPasswordResetEmail = (email, token, req) => {
   const tokenAndEmail = `${token}+${email}`;
   const encryptedTokenAndEmail = encrypt(tokenAndEmail).encryptedMessage;
   const key = encrypt(tokenAndEmail).key
-  const resetUrl = `https://budgeti-api.onrender.com/reset-password/${encryptedTokenAndEmail}&key=${key}`;
+  const resetUrl = `https://budgeti-efsd.onrender.com/reset-password/${encryptedTokenAndEmail}&key=${key}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: email,
@@ -188,29 +188,61 @@ const resetPassword = async (req, res) => {
 
 const uploadProfilePicture = async (req, res, next) => {
   const userId = req.user._id;
-  const { imageUrl } = req.body;
-  console.log(imageUrl)
-
-  if (!imageUrl) {
-    return res.status(400).json({ error: "No image URL provided" });
+  
+  if (!req.file) {
+    return res.status(400).json({ error: "No image file provided" });
+  }
+  if (!req.file.mimetype.startsWith("image/")) {
+    return res.status(400).json({ error: "Invalid File type" });
   }
 
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    // Setup Cloudinary upload stream
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "budgeti",
+        format: "png",
+        public_id: `${req.file.originalname.replace(
+          /\.[^/.]+$/,
+          ""
+        )}_${Date.now()}`,
+        transformation: {
+          width: 400,
+          height: 400,
+          crop: "fill",
+          quality: "auto:good",
+          gravity: "faces",
+          fetch_format: "auto",
+          max_bytes: 80000,
+        },
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("Error uploading to Cloudinary", error);
+          return res
+            .status(500)
+            .json({ error: "Error uploading image to Cloudinary" });
+        }
 
-    user.profilePicture = imageUrl;
-    await user.save();
+        const user = await User.findById(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
 
-    res.status(200).json({
-      message: "Profile picture updated successfully",
-      url: imageUrl,
-    });
+        user.profilePicture = result.secure_url;
+        await user.save();
+
+        res.status(200).json({
+          message: "Profile picture updated successfully",
+          url: result.secure_url,
+        });
+      }
+    );
+
+    // Stream the file buffer to Cloudinary
+    streamifier.createReadStream(req.file.buffer).pipe(stream);
   } catch (error) {
-    console.error("Error updating profile picture", error);
-    res.status(500).json({ error: "Error updating profile picture" });
+    console.error("Error processing image", error);
   }
 };
 

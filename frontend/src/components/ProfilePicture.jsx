@@ -7,7 +7,7 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from "../firebase"
 import { useNavigate } from 'react-router-dom';
 
-const devApiUrl = 'https://budgeti-efsd.onrender.com';
+const devApiUrl = 'http://localhost:8000';
 
 const ProfilePicture = () => {
     const fileRef = useRef(null)

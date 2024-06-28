@@ -9,7 +9,7 @@ import axios from "axios";
 import ModalComponent from "./ModalComponent";
 
 // const apiUrl = 'https://testenv-budgetapp-api.onrender.com';
-const devApiUrl = 'https://budgeti-efsd.onrender.com';
+const devApiUrl = 'http://localhost:8000';
 
 const Category = () => {
     const [showModal, setShowModal] = useState(false);
