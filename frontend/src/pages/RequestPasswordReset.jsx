@@ -21,7 +21,7 @@ const RequestPasswordReset = () => {
      
     }
   return (
-      <div className="p-3 max-w-lg mx-auto h-screen">
+      <div className="p-3 max-w-lg mx-auto">
         <h2 className="text-3xl text-center font-semibold my-7">Reset Your Password</h2>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit((data) => submitForm(data))}>
             <input type="email" name="email" id="email" placeholder="Email Address" className="border p-3 rounded-lg" 

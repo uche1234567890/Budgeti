@@ -7,8 +7,7 @@ const {
   sumMonthlyIncome,
   sumYearlyIncome,
   sumMonthlyExpensesByCategory,
-  sumYearlyExpensesByCategory,
-  forecastNextMonthExpense
+  sumYearlyExpensesByCategory
 } = require("../controllers/aggregationController");
 const userAuth = require("../middlewares/userAuthMiddleware");
 
@@ -32,8 +31,5 @@ router.get("/sum-monthly-expenses-by-category/:monthYear", userAuth, sumMonthlyE
 
 // Summation of all expense transaction per category by a user in a year
 router.get("/sum-yearly-expenses-by-category/:year", userAuth, sumYearlyExpensesByCategory);
-
-// Forecast next month's expense
-router.get("/forecast-next-month-expense", userAuth, forecastNextMonthExpense);
 
 module.exports = router;

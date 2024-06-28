@@ -16,7 +16,6 @@ const Category = () => {
     const [categories, setCategories] = useState([])
     const [initialValues, setInitialValues] = useState({ name: "", icon: "", budgetAmount: "" });
     const [isEdit, setIsEdit] = useState(false);
-    const [categoryId, setCategoryId] = useState()
     const navigate = useNavigate()
 
     const token = localStorage.getItem('token');
@@ -34,47 +33,11 @@ const Category = () => {
         fetchCategories()
     }, [])
 
-    const updateCategory = (targetId, updatedValues) => {
-      setCategories(prevCategories => {
-        const categoryExists = prevCategories.some(category => category._id === targetId);
-  
-        if (categoryExists) {
-          return prevCategories.map(category =>
-            category._id === targetId
-              ? { ...category, ...updatedValues}
-              : category
-          );
-        } else {
-          const newCategory = {
-            _id: targetId,
-            ...updatedValues
-          };
-          return [...prevCategories, newCategory];
-        }
-      });
-    };
-
-    const deleteCategory = (targetId) => {
-      setCategories(prevCategories => {
-        return prevCategories.filter(category => category._id !== targetId)
-      })
-    }
-
     const submitForm = async (data) => {
       if(isEdit){
+        console.log(data)
         const {name, icon, budgetAmount} = data
-        await axios.patch(`${devApiUrl}/api/category/update`, {name, icon, budgetAmount, categoryId}).then(response => {
-          updateCategory(response.data._id, response.data)
-          toast.success("Category Update Successful")
-          navigate("/dashboard")
-          setShowModal(false)
-        }).catch(err => {
-          toast.error(err.response.data.message)
-        })
-      }else{
-        const {name, icon, budgetAmount} = data
-        await axios.post(`${devApiUrl}/api/category/create`, {name, icon, budgetAmount}).then(response => {
-          updateCategory(response.data._id, response.data)
+        await axios.post(`${devApiUrl}/api/category/update`, {name, icon, budgetAmount}).then(response => {
           toast.success("Category Creation Successful")
           navigate("/dashboard")
           setShowModal(false)
@@ -82,6 +45,14 @@ const Category = () => {
           toast.error(err.response.data.message)
         })
       }
+      const {name, icon, budgetAmount} = data
+      await axios.post(`${devApiUrl}/api/category/create`, {name, icon, budgetAmount}).then(response => {
+        toast.success("Category Creation Successful")
+        navigate("/dashboard")
+        setShowModal(false)
+      }).catch(err => {
+        toast.error(err.response.data.message)
+      })
     }
 
     const handleCreate = () => {
@@ -92,16 +63,16 @@ const Category = () => {
 
   const handleEdit = (category) => {
       setInitialValues(category);
-      setCategoryId(category._id)
       setIsEdit(true);
       setShowModal(true);
   };
 
     const handleDelete = async (categoryId) => {
+      console.log(categoryId)
       await axios.delete(`${devApiUrl}/api/category/delete/${categoryId}`).then(response => {
-        deleteCategory(categoryId)
+        console.log(response)
         toast.success("Deleted Successfully")
-        navigate("/dashboard")
+        navigate("/profile")
       }).catch(err => {
         toast.error(err.response.data.message)
       })
@@ -111,12 +82,6 @@ const Category = () => {
         <div className="flex justify-end mb-2 mx-2">
             <button className="px-4 py-2 rounded-lg bg-indigo-600 text-white" onClick={handleCreate}>Create Category</button>
         </div>
-
-        <div className="category-section h-40 py-12 mb-16 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Category</h2>
-          <p className="text-gray-600">Set up each of your categories with the appropriate budget and icons to track your categories.</p>
-        </div>
-
         
 
 <div className="relative overflow-x-auto bg-inherit shadow-md sm:rounded-lg">
@@ -130,7 +95,7 @@ const Category = () => {
                     Icon
                 </th>
                 <th scope="col" className="px-6 py-3">
-                    Budget Amount
+                    Amount
                 </th>
                 <th scope="col" className="px-6 py-3">
                     Created

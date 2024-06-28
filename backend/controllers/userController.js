@@ -39,7 +39,7 @@ const sendVerificationEmail = (user, req) => {
   const tokenAndEmail = `${user.verificationToken}+${user.email}`;
   const encryptedTokenAndEmail = encrypt(tokenAndEmail).encryptedMessage;
   const key = encrypt(tokenAndEmail).key
-  const verificationUrl = `https://budgeti-efsd.onrender.com/verify-email/${encryptedTokenAndEmail}&key=${key}`;
+  const verificationUrl = `https://testenv-budgetapp-ui-app.onrender.com/verify-email/${encryptedTokenAndEmail}&key=${key}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: user.email,
@@ -61,7 +61,7 @@ const sendPasswordResetEmail = (email, token, req) => {
   const tokenAndEmail = `${token}+${email}`;
   const encryptedTokenAndEmail = encrypt(tokenAndEmail).encryptedMessage;
   const key = encrypt(tokenAndEmail).key
-  const resetUrl = `https://budgeti-efsd.onrender.com/reset-password/${encryptedTokenAndEmail}&key=${key}`;
+  const resetUrl = `https://testenv-budgetapp-ui-app.onrender.com/reset-password/${encryptedTokenAndEmail}&key=${key}`;
   const mailOptions = {
     from: process.env.EMAIL_SENDER,
     to: email,
@@ -146,9 +146,9 @@ const editUser = async (req, res) => {
   const { id } = req.params
   const { firstname, lastname, username } = req.body;
   const userId = req.user._id;
-  if(id != userId){
-    return res.status(400).json({message: "Invalid User"})
-  }
+  // if(id !== userId){
+  //   return res.status(400).json({message: "Invalid User"})
+  // }
   try {
     const user = await User.editUser(userId, firstname, lastname, username);
     res

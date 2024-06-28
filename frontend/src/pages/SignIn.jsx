@@ -25,12 +25,12 @@ const SignIn = () => {
             setAuthUser(response.data.user)
             navigate("/dashboard")
           }).catch(err => {
-            toast.error(err.response.data.error)
+            toast.error(err.response.data.message)
           })
       }
 
   return (
-    <div className="p-3 max-w-lg mx-auto h-screen">
+    <div className="p-3 max-w-lg mx-auto">
         <h2 className="text-3xl text-center font-semibold my-7">Sign In</h2>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit((data) => submitForm(data))}>
 

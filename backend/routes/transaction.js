@@ -7,7 +7,6 @@ const {
   listTransactions,
   getTransactionsByMonth,
   getTransactionsByDay,
-  getTransactionsByYear,
 } = require("../controllers/transactionController");
 const userAuth = require("../middlewares/userAuthMiddleware");
 
@@ -28,8 +27,5 @@ router.get("/by-month/:monthYear", userAuth, getTransactionsByMonth);
 
 // Add the new route for transactions by day
 router.get('/by-day/:dayMonthYear', userAuth, getTransactionsByDay);
-
-// Get transactions by year
-router.get('/by-year/:year', userAuth, getTransactionsByYear);
 
 module.exports = router;

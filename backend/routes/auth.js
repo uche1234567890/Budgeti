@@ -10,7 +10,7 @@ const {
 } = require("../controllers/userController");
 
 // Login Route with rate limiter
-router.post("/login", loginUser);
+router.post("/login", loginLimiter, loginUser);
 
 // Sign-up Route
 router.post("/signup", signupUser);

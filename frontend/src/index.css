@@ -1,27 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-.hero-section {
-    background-image: url('./assets/images/background-image.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-
-.category-section{
-    background-image: url('./assets/images/category-image.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-.transaction-section{
-    background-image: url('./assets/images/transaction-image.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-.budget-section{
-    background-image: url('./assets/images/budget-image.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-}

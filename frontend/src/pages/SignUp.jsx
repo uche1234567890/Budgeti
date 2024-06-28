@@ -23,15 +23,15 @@ const SignUp = () => {
       console.log(data)
       await axios.post(`${devApiUrl}/api/auth/signup`, {firstname, lastname, username, email, password}).then(response => {
         console.log(response)
-        toast.success("Sign In Successful, Check your email for the verification link to proceed")
-        navigate("/sign-in")
+        toast.success("Sign In Successful, Checkyour email for a the verification link to proceed")
+        //navigate("/sign-in")
       }).catch(err => {
         toast.error(err.response.data.message)
       })
      
     }
   return (
-    <div className="p-3 max-w-lg mx-auto h-screen">
+    <div className="p-3 max-w-lg mx-auto">
         <h2 className="text-3xl text-center font-semibold my-7">Sign Up</h2>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit((data) => submitForm(data))}>
             <input type="text" name="firstname" id="firstname" placeholder="Firstname" className="border p-3 rounded-lg" 

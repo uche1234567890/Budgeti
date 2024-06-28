@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react"
-import { FaTrash, FaPen} from 'react-icons/fa'
+import { FaEye, FaTrash, FaPen} from 'react-icons/fa'
 import axios from "axios";
 import { toast } from "react-toastify";
 import DatePicker from 'react-datepicker';
@@ -36,6 +36,8 @@ const Transaction = () => {
       setSelectedDate(date);
       await axios.get(`${devApiUrl}/api/transaction/by-day/${formatDateValue(date, 'day')}`).then(response => {
         setTransactions(response.data.transactions)
+        //toast.success("Sign In Successful")
+        //navigate("/profile")
       }).catch(err => {
         toast.error(err.response.data.message)
       })
@@ -45,6 +47,8 @@ const Transaction = () => {
       setSelectedMonth(date);
       await axios.get(`${devApiUrl}/api/transaction/by-month/${formatDateValue(date, 'month')}`).then(response => {
         setTransactions(response.data.transactions)
+        //toast.success("Sign In Successful")
+        //navigate("/profile")
       }).catch(err => {
         toast.error(err.response.data.message)
       })
@@ -55,6 +59,8 @@ const Transaction = () => {
         const fetchTransactions = async () => {
           await axios.get(`${devApiUrl}/api/transaction/list-all`).then(response => {
             setTransactions(response.data.transactions)
+            //toast.success("Sign In Successful")
+            //navigate("/profile")
           }).catch(err => {
             toast.error(err.response.data.message)
           })
@@ -62,32 +68,6 @@ const Transaction = () => {
 
         fetchTransactions()
     }, [])
-
-    const updateTransaction = (targetId, updatedValues) => {
-      setTransactions(prevTransactions => {
-        const transactionExists = prevTransactions.some(category => category._id === targetId);
-  
-        if (transactionExists) {
-          return prevTransactions.map(transaction =>
-            transaction._id === targetId
-              ? { ...transaction, ...updatedValues}
-              : transaction
-          );
-        } else {
-          const newTransaction = {
-            _id: targetId,
-            ...updatedValues
-          };
-          return [...prevTransactions, newTransaction];
-        }
-      });
-    };
-
-    const deleteTransaction = (targetId) => {
-      setTransactions(prevTransactions => {
-        return prevTransactions.filter(transaction => transaction._id !== targetId)
-      })
-    }
 
     const handleCreate = () => {
       setInitialValues({});
@@ -104,30 +84,33 @@ const Transaction = () => {
   };
 
     const handleDelete = async (transactionId) => {
+      console.log(transactionId)
       await axios.delete(`${devApiUrl}/api/transaction/delete/${transactionId}`).then(response => {
-        deleteTransaction(transactionId)
+        console.log(response)
         toast.success("Deleted Successfully")
+        navigate("/profile")
       }).catch(err => {
         toast.error(err.response.data.message)
       })
     }
 
     const submitForm = async (data) => {
+      console.log(data)
       if(isEdit){
         const {type, amount, description, category} = data
         await axios.patch(`${devApiUrl}/api/transaction/update/${transactionId}`, {type, amount, description, category}).then(response => {
-          updateTransaction(response.data.transaction._id, response.data.transaction)
-          toast.success("Transaction Updated Successful")
-          setShowTransactionModal(false);
+          console.log(response)
+          //toast.success("Category Creation Successful")
+          //navigate("/profile")
         }).catch(err => {
           toast.error(err.response.data.message)
         })
       }else{
         const {type, amount, description, category} = data
         await axios.post(`${devApiUrl}/api/transaction/create`, {type, amount, description, category}).then(response => {
-          updateTransaction(response.data.transaction._id, response.data.transaction)
-          toast.success("Transaction Creation Successful")
-          setShowTransactionModal(false);
+          console.log(response)
+          toast.success("Category Creation Successful")
+          //navigate("/profile")
         }).catch(err => {
           toast.error(err.response.data.message)
         })
@@ -138,9 +121,9 @@ const Transaction = () => {
   return (
     <div>
         <div className="flex flex-row justify-end mb-2 mx-2">
-            <div className="flex flex-row mx-2 items-center space-x-0 md:space-x-2">
+            <div className="flex flex-row mx-2 items-center">
               <div className="mb-4">
-                <select value={filterType} onChange={handleFilterTypeChange} className="border border-gray-300 px-3 py-1 rounded-xl w-full md:w-56 h-12">
+                <select value={filterType} onChange={handleFilterTypeChange} className="border p-2 rounded-lg">
                   <option value="">Select Time Period</option>
                   <option value="day">Day</option>
                   <option value="month">Month</option>
@@ -153,7 +136,7 @@ const Transaction = () => {
                     selected={selectedDate}
                     onChange={handleDateChange}
                     dateFormat="dd-MM-yyyy"
-                    className="border border-gray-300 px-3 py-1 rounded-xl w-full md:w-56 h-12"
+                    className="border p-2 rounded-lg"
                   />
                 </div>
               ) }
@@ -164,17 +147,12 @@ const Transaction = () => {
                     onChange={handleMonthChange}
                     dateFormat="MM-yyyy"
                     showMonthYearPicker
-                    className="border border-gray-300 px-3 py-1 rounded-xl w-full md:w-56 h-12"
+                    className="border p-2 rounded-lg"
                   />
                 </div>
               ) }
             </div>
-            <button className="px-3 py-1 rounded-xl bg-indigo-600 text-white w-full md:w-56 h-12" onClick={handleCreate}>Create Transaction</button>
-        </div>
-
-        <div className="transaction-section h-40 py-12 mb-16 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-3xl font-bold text-slate-50 mb-2">Transaction</h2>
-          <p className="text-green-600">Keep track of all of your income and expenses for a better spending habit</p>
+            <button className="px-4 py-2 rounded-lg bg-indigo-600 text-white" onClick={handleCreate}>Create Transaction</button>
         </div>
         
 
@@ -202,7 +180,7 @@ const Transaction = () => {
         <tbody>
           {transactions?.map((transaction, index) => (
             <tr key={index} className="bg-white dark:border-gray-700">
-                <th scope="row" className={`px-6 py-4 font-medium whitespace-nowrap ${transaction.type == 'income' ? 'text-green-500' : transaction.type == 'expense' ? 'text-red-500': 'text-blue-500'}`}>
+                <th scope="row" className={`px-6 py-4 font-medium whitespace-nowrap ${transaction.type == 'income' ? 'text-blue-500' : transaction.type == 'expense' ? 'text-red-500': 'text-blue-500'}`}>
                     {capitalizeFirstLetter(transaction.type)}
                 </th>
                 <td className="px-6 py-4">
@@ -267,7 +245,13 @@ const Transaction = () => {
                   >
                     Close
                   </button>
-                  
+                  <button
+                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setShowTransactionModal(false)}
+                  >
+                    Save Changes
+                  </button>
                 </div>
               </div>
             </div>
